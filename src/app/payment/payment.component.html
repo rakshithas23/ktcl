@@ -4,9 +4,10 @@
     <!--END-->
     <section class="diagonal-background pt-5">
         <div class="container py-5">
-          <h3 class="text-center text-white py-5">Your Application Number :</h3>
           <form [formGroup]="paymentForm">
             <div class="row">
+              <h3 class="text-center text-white py-5">Your Application Number : <input type="text" class="form-control p-3" formControlName="applicationNumber" readonly/></h3>
+
               <div class="form-group pb-3 col-12 col-lg-4 pb-3">
                 <label for="cardBalance" class="text-white" style="font-size: 22px;">Minimum Card Balance</label>
                 <input type="number" class="form-control p-3" id="cardBalance" formControlName="cardBalance" readonly required>

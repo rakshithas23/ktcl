@@ -178,6 +178,7 @@
               type="text"
               formControlName="state"
               class="form-control p-3"
+              value="Goa"
               readonly
             />
           </div>
@@ -186,6 +187,7 @@
             <input
               type="text"
               formControlName="city"
+              value="Panaji"
               class="form-control p-3"
               readonly
             />
@@ -233,24 +235,55 @@
         </div>
 
         <div class="form-group row text-white d-lg-flex">
+          <div class="col-12 col-lg-4">
+            <label for="address_proof_type">Address Proof Type</label>
+            <select
+              formControlName="address_proof_type"
+              class="form-control p-3"
+              id="address_proof_type"
+            >
+              <option value="">Select Address Proof Type</option>
+              <option value="Electricity Bill">Electricity Bill</option>
+              <option value="Passport">Passport</option>
+              <option value="Voter ID">Voter ID</option>
+              <option value="PAN">PAN</option>
+              <option value="Aadhar Card">Aadhar Card</option>
+            </select>
+            <div
+              *ngIf="
+              seniorcitizenForm.get('address_proof_type')?.invalid &&
+              seniorcitizenForm.get('address_proof_type')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Address Proof Type is required
+            </div>
+          </div>
           <div class="col-12 col-lg-4 pb-3">
             <label>Upload Address Proof Document</label>
-            <input type="file" formControlName="proofAddress" class="form-control p-3"accept=".pdf, .jpg, .jpeg, .png"  (change)="validateFileSize($event, 'proofAddress')" />
+            <input type="file" class="form-control p-3"accept=".pdf, .jpg, .jpeg, .png"  (change)="validateFileSize($event, 'proofAddress')" />
             <small>Document Size has to be less than 1MB.</small>
             <div *ngIf="fileErrors['proofAddress']" class="text-warning" style="font-weight: 800;">{{ fileErrors['proofAddress'] }}</div>
           </div>
+          <input type="hidden" formControlName="proofAddress" />
+
           <div class="col-12 col-lg-4 pb-3">
             <label>Upload Age Proof</label>
-            <input type="file" formControlName="proofAge" class="form-control p-3" accept=".pdf, .jpg, .jpeg, .png" (change)="validateFileSize($event, 'proofAge')" />
+            <input type="file"  class="form-control p-3" accept=".pdf, .jpg, .jpeg, .png" (change)="validateFileSize($event, 'proofAge')" />
             <small>Document Size has to be less than 1MB.</small>
             <div *ngIf="fileErrors['proofAge']" class="text-warning" style="font-weight: 800;">{{ fileErrors['proofAge'] }}</div>
           </div>
+          <input type="hidden" formControlName="proofAge" />
+
           <div class="form-group col-lg-4 text-white">
             <label>Photograph</label>
-            <input type="file" formControlName="photo" class="form-control p-3" accept="image/*" capture="user" (change)="validateFileSize($event, 'photo')" />
+            <input type="file" class="form-control p-3" accept="image/*" capture="user" (change)="onFileSelected($event)" />
             <small>Document Size has to be less than 1MB.</small>
             <div *ngIf="fileErrors['photo']" class="text-warning" style="font-weight: 800;">{{ fileErrors['photo'] }}</div>
           </div>
+          <input type="hidden" formControlName="photoBase64" />
+
           
           
         </div>

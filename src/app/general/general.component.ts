@@ -1,15 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-general',
   templateUrl: './general.component.html',
-  styleUrls: ['./general.component.css']
+  styleUrls: ['./general.component.css'],
 })
 export class GeneralComponent implements OnInit {
   api: any = sessionStorage.getItem('api');
+  user_id: any = sessionStorage.getItem('user_id');
+
   generalForm: FormGroup;
   minDate: string;
   defaultDob: string;
@@ -30,20 +37,20 @@ export class GeneralComponent implements OnInit {
       aadharNo: ['', [Validators.required, Validators.pattern('\\d{12}')]],
       mobile: ['', [Validators.required, Validators.pattern('\\d{10}')]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
-      age: [{ value: '', disabled: true }, Validators.required],
+      age: ['', Validators.required],
       gender: ['', Validators.required],
       address: ['', Validators.required],
-      state: [{ value: 'Goa', disabled: true }, Validators.required],
-      city: [{ value: 'Panaji', disabled: true }, Validators.required],
+      state: ['Goa', Validators.required],
+      city: ['Panaji', Validators.required],
       pincode: ['', [Validators.required, Validators.pattern('^403\\d{3}$')]],
       email: ['', [Validators.email]],
+      address_proof_type: ['',[Validators.required]],
       proofAddress: ['', Validators.required],
-      photo: ['', Validators.required],
+      photoBase64: ['', Validators.required],
     });
   }
-  
-  ngOnInit(): void {
-  }
+
+  ngOnInit(): void {}
 
   async validateFileSize(event: Event, fieldName: string) {
     const input = event.target as HTMLInputElement;
@@ -52,21 +59,39 @@ export class GeneralComponent implements OnInit {
       try {
         const resizedFile = await this.resizeImage(file);
         const fileSizeMB = resizedFile.size / (1024 * 1024); // Convert size to MB
-
+  
         if (fileSizeMB > 1) {
-          this.fileErrors = { ...this.fileErrors, [fieldName]: 'File size must not exceed 1 MB.' };
+          this.fileErrors = {
+            ...this.fileErrors,
+            [fieldName]: 'File size must not exceed 1 MB.',
+          };
           this.generalForm.get(fieldName)?.setErrors({ invalidSize: true });
         } else {
           this.fileErrors = { ...this.fileErrors, [fieldName]: '' };
           this.generalForm.get(fieldName)?.setErrors(null);
-          // Update the form control with resized image
-          this.generalForm.get(fieldName)?.setValue(resizedFile);
+  
+          // Convert the image to Base64
+          const base64Image = await this.convertToBase64(resizedFile);
+  
+          // If the field is 'photo', remove any existing fake path
+          if (fieldName === 'photo') {
+            // Set the Base64 string to the form control
+            this.generalForm.get(fieldName)?.setValue(base64Image);
+          } else {
+            // Handle other fields normally
+            this.generalForm.get(fieldName)?.setValue(base64Image);
+          }
+  
+          console.log(`${fieldName} Base64 Image:`, base64Image);
         }
       } catch (error) {
-        console.error('Error resizing image:', error);
+        console.error('Error processing image:', error);
       }
     }
   }
+  
+  
+  
   resizeImage(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -79,17 +104,17 @@ export class GeneralComponent implements OnInit {
           const maxHeight = 1024; // Set max height
           let width = img.width;
           let height = img.height;
-
+  
           if (width > maxWidth) {
             height *= maxWidth / width;
             width = maxWidth;
           }
-
+  
           if (height > maxHeight) {
             width *= maxHeight / height;
             height = maxHeight;
           }
-
+  
           canvas.width = width;
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
@@ -107,8 +132,51 @@ export class GeneralComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
+  
+  convertToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.photo(file)
+        .then((base64: string) => {
+          // Do something with the base64 string, e.g., set it in a form control or send it to the backend
+          const mimeType = file.type || 'image/png'; // Default to 'image/png' if type is unavailable
+          // Prepend the MIME type and encoding information
+          const base64WithPrefix = `data:${mimeType};base64,${base64}`;
+          // console.log(base64WithPrefix);
+          this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
+          console.log(this.generalForm.value.photoBase64)
+        })
+        .catch((error) => {
+          console.error('Error converting file to Base64:', error);
+          this.fileErrors['photo'] = 'Failed to convert the image to Base64.';
+        });
+    }
+  }
+
+  photo(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
   onSubmit(): void {
-    // this.router.navigate(['/payment']);
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
     const aadharegex = /^\d{12}$/;
     const phoneregex = /^[6-9]\d{9}$/;
@@ -148,6 +216,10 @@ export class GeneralComponent implements OnInit {
       alert('Please Enter Date of Birth');
       return;
     }
+    else if (this.dob === true) {
+      alert('Date of Birth has to be 5 years.');
+      return;
+    }
     if (this.generalForm.value.gender === '') {
       alert('Please Select Gender');
       return;
@@ -176,22 +248,23 @@ export class GeneralComponent implements OnInit {
       alert('Please Enter a valid Email Address');
       return;
     }
-    
+
     if (this.generalForm.value.proofAddress === '') {
       alert('Please Upload Address proof document');
       return;
     }
-   
-    if (this.generalForm.value.photo === '') {
+
+    if (this.generalForm.value.photoBase64 === '') {
       alert('Please Upload Photograph');
       return;
     }
-    if(Object.values(this.fileErrors).some(error => error)){
-      alert("Document Uploaded should be of maximum size 1 MB");
+    if (Object.values(this.fileErrors).some((error) => error)) {
+      alert('Document Uploaded should be of maximum size 1 MB');
       return;
     }
     const data = {
       name: this.generalForm.value.name,
+      user_type: "3",
       fatherName: this.generalForm.value.fatherName,
       aadharNo: this.generalForm.value.aadharNo,
       mobile: this.generalForm.value.mobile,
@@ -203,66 +276,69 @@ export class GeneralComponent implements OnInit {
       city: this.generalForm.value.city,
       pincode: this.generalForm.value.pincode,
       email: this.generalForm.value.email,
-      institution_type: this.generalForm.value.institution_type,
-      inst_address: this.generalForm.value.inst_address,
+      proofAddressType: this.generalForm.value.address_proof_type,
       proofAddress: this.generalForm.value.proofAddress,
-      photo: this.generalForm.value.photo,
+      photo: this.generalForm.value.photoBase64,
+      user_id: this.user_id
+
     };
 
-    this.http.post(this.api + '', data).subscribe((result: any) => {
-      let obj = JSON.stringify(result);
-      interface Obj {
-        insertId: any;
-        status: number;
-        msg: string;
-        data: any;
-      }
-      interface ObjData {
-        id: any;
-        username: string;
-      }
-      let res: Obj = JSON.parse(obj);
-      if (res.status == 1) {
-        alert('Details Submitted Successfully!');
-        this.router.navigate(['/payment']);
-      } else {
-        alert('Failed to Submit, Please Try Again');
-        console.log('error');
-      }
-    });
+    console.log("data",data)
+
+    this.http
+      .post(this.api + '/add_gen_details', data)
+      .subscribe((result: any) => {
+        let obj = JSON.stringify(result);
+        interface Obj {
+          insertId: any;
+          status: any;
+          message: string;
+          application_number: any;
+        }
+        let res: Obj = JSON.parse(obj);
+        if (res.status === 'success') {
+          alert('Details Submitted Successfully!');
+          this.router.navigate(['/payment'], {
+            queryParams: { application_number: res.application_number },
+          });
+        } else {
+          alert('Failed to Submit,' + res.message);
+          console.log('error');
+        }
+      });
   }
 
   calculateMinDate(): string {
     const today = new Date();
     const minDate = new Date(
-      today.getFullYear() - 60, // Set to 60 years ago
+      today.getFullYear() - 5,
       today.getMonth(),
       today.getDate()
     );
     return minDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
-  
+
   calculateDefaultDate(): string {
     const today = new Date();
     const defaultDate = new Date(
-      today.getFullYear() - 60, // Set default date to 60 years ago
+      today.getFullYear() - 5,
       today.getMonth(),
       today.getDate()
     );
     return defaultDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
-  
+
   dateValidator(control: FormControl) {
     const today = new Date();
     const inputDate = new Date(control.value);
     const minDate = new Date(
-      today.getFullYear(), // Minimum age is 60 years
+      today.getFullYear() - 5,
       today.getMonth(),
       today.getDate()
     );
     return inputDate <= minDate ? null : { invalidDate: true };
   }
-  
+
   calculateAge() {
     const dob = this.generalForm.get('dob')?.value;
     if (dob) {
@@ -277,13 +353,16 @@ export class GeneralComponent implements OnInit {
         age--;
       }
       console.log('Age:', age);
-  
+
       // Update the age in the form control
-      this.generalForm.patchValue({ age: age });
-  
-      // Check if age is less than 60 and show an alert
-     
+
+      // Check if age is less than 5 and show an alert
+      if (age < 5) {
+        alert('Age must be at least 5 years old.');
+        return;
+      } else {
+        this.generalForm.get('age')?.setValue(age);
+      }
     }
   }
-
 }

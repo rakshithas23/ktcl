@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
         interface Obj {
           status: number;
           message: string;
-          data: any;
+          user_id: any;
         }
         interface ObjData {
           id: any;
@@ -67,8 +67,10 @@ export class LoginComponent implements OnInit {
 
         let res: Obj = JSON.parse(obj);
         if (res.status == 1) {
-          let dataRes: any = JSON.stringify(res.data);
+          let dataRes: any = JSON.stringify(res.user_id);
           sessionStorage.setItem('api', this.api);
+          sessionStorage.setItem('user_id',res.user_id);
+
           this.router.navigate(['/home']);
         } else {
           alert('Failed to Login,' +res.message);

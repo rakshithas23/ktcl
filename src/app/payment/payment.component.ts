@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 // import { RazorpayService } from '../razorpay.service';
 declare var Razorpay: any;
@@ -12,13 +12,16 @@ declare var Razorpay: any;
 export class paymentComponent implements OnInit {
   paymentForm: FormGroup;
   orderId: any;
+  applicationNumber: any;
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.paymentForm = this.fb.group({
+      applicationNumber: [''],
       cardBalance: [{ value: 150, disabled: true }, Validators.required],
       topupValue: [
         0,
@@ -33,6 +36,10 @@ export class paymentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.applicationNumber = params['application_number'];
+    });
+    this.paymentForm.patchValue({ applicationNumber: this.applicationNumber });
     this.paymentForm.get('topupValue')?.valueChanges.subscribe((value) => {
       this.calculateTotalAmount();
     });
@@ -64,7 +71,10 @@ export class paymentComponent implements OnInit {
       description: 'Payment for your order',
       handler: (response: any) => {
         console.log('Payment successful', response);
-        console.log("response.razorpay_payment_id",response.razorpay_payment_id)
+        console.log(
+          'response.razorpay_payment_id',
+          response.razorpay_payment_id
+        );
         this.router.navigate(['/success']);
       },
       prefill: {
