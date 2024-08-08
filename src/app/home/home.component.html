@@ -1,0 +1,65 @@
+<main class="main" id="top">
+    <!--NAVBAR-->
+   <app-navbar></app-navbar>
+    <!--END-->
+
+    <!--HERO SECTION-->
+    <section class="diagonal-background pt-5">
+      <div class="container pt-5">
+       
+
+        <div class="row pt-lg-5 d-flex justify-content-center">
+          <h2 class="py-4 text-white text-center">Types of Smart Card</h2>
+          <div class="col-lg-3 col-sm-6 mb-5">
+            <a
+              class="card service-card shadow-hover rounded-3 text-center align-items-center"
+              [routerLink]="['/student']"
+            
+              id="showStudentPassButton"
+            >
+              <div class="card-body p-xxl-5 p-4">
+                <img
+                  src="../../assets/img/icon1.png"
+                  width="75"
+                  alt="Service"
+                />
+                <h4 class="mb-3">Student Card</h4>
+              </div>
+            </a>
+          </div>
+          <div class="col-lg-3 col-sm-6 mb-5">
+            <a
+              class="card service-card shadow-hover rounded-3 text-center align-items-center"
+              [routerLink]="['/senior-citizen']"
+              
+              id="showSeniorPassButton"
+            >
+              <div class="card-body p-xxl-5 p-4">
+                <img
+                src="../../assets/img/icon2.png"
+                  width="75"
+                  alt="Service"
+                />
+                <h4 class="mb-3">Senior Citizen Card</h4>
+              </div>
+            </a>
+          </div>
+          <div class="col-lg-3 col-sm-6 mb-5">
+            <a
+              class="card service-card shadow-hover rounded-3 text-center align-items-center"
+              [routerLink]="['/general']"
+              id="showMonthlyPassButton"
+            >
+              <div class="card-body p-xxl-5 p-4">
+                <img src="../../assets/img/month.png" width="75" alt="Service" />
+                <h4 class="mb-3">General Card</h4>
+              </div>
+            </a>
+          </div>
+        
+        </div>
+       
+      </div>
+    </section>
+
+</main>

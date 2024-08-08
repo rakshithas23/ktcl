@@ -1,0 +1,52 @@
+.user-form {
+  background-color: white; /* Dark background color */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: white; /* Subtle shadow */
+}
+
+.form-label {
+  font-size: 1.2rem; /* Adjust label font size */
+  font-weight: 500; /* Slightly bolder font weight */
+}
+
+.form-control {
+  border-radius: 4px; /* Rounded corners for input fields */
+  border: white; /* Border color */
+  background-color: white; /* Darker background for input */
+ /* White text color */
+}
+
+.form-control::placeholder {
+  color: grey; /* Lighter placeholder text color */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Primary button color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker color on hover */
+}
+
+
+/* login.component.css */
+
+.form-group .btn-link {
+  top: 55px !important;
+  color:#BB3D00; /* Button color */
+  font-size: 1.7rem; /* Adjust font size for visibility icon */
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  cursor: pointer; /* Pointer cursor for button */
+}
+
+.form-group .btn-link:hover {
+  color: #BB3D00; /* Color change on hover */
+}
+
+.form-group .form-control {
+  padding-right: 3rem; /* Space for the show/hide button */
+}
+

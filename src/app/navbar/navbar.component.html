@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top py-3">
+  <div class="container-fluid d-flex justify-content-between">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img
+        src="../../assets/img/log.png"
+        class="img-fluid nav-img"
+        alt="Logo"
+      />
+    </a>
+    <div>
+      <a
+        [routerLink]="['/home']"
+        *ngIf="currentRoute !== '/home'"
+        class="btn btn-lg bg-warning m-1"
+        >Back</a
+      >
+
+      <a [routerLink]="['/logout']" class="btn btn-lg bg-warning m-1">Logout</a>
+    </div>
+  </div>
+</nav>

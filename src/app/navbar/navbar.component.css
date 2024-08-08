@@ -1,0 +1,34 @@
+/* Blurred Navbar */
+.navbar {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* White with 30% opacity for semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for better contrast */
+}
+
+.navbar-brand img {
+  max-height: 100px; /* Set a maximum height for the logo */
+}
+
+.navbar-nav .nav-item .nav-link {
+  color: #ffffff; /* White text color */
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+  color: #bb3d00; /* Change text color on hover */
+}
+
+.nav-img {
+  width: 300px;
+}
+
+@media screen and (max-width: 991px) {
+  .nav-img {
+    width: 130px;
+  }
+}

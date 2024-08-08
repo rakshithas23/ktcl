@@ -1,0 +1,28 @@
+<main class="main" id="top">
+    <!--NAVBAR-->
+   <app-navbar></app-navbar>
+    <!--END-->
+    <section class="diagonal-background pt-5">
+        <div class="container py-5">
+          <h3 class="text-center text-white py-5">Your Application Number :</h3>
+          <form [formGroup]="paymentForm">
+            <div class="row">
+              <div class="form-group pb-3 col-12 col-lg-4 pb-3">
+                <label for="cardBalance" class="text-white" style="font-size: 22px;">Minimum Card Balance</label>
+                <input type="number" class="form-control p-3" id="cardBalance" formControlName="cardBalance" readonly required>
+              </div>
+              <!-- <div class="form-group col-12 col-lg-4 pb-3">
+                <label for="topupValue" class="text-white" style="font-size: 22px;">Top Up Value (Optional)</label>
+                <input type="number" class="form-control p-3" id="topupValue" formControlName="topupValue" [min]="0" placeholder="Please enter Top Up Value" required (keypress)="validateNumber($event)">
+              </div> -->
+              <div class="form-group col-12 col-lg-4 pb-3">
+                <label for="totalAmount" class="text-white" style="font-size: 22px;">Total Amount to be paid</label>
+                <input type="number" class="form-control p-3" id="totalAmount" formControlName="totalAmount" placeholder="Total Amount" readonly required>
+              </div>
+            </div>
+            <a class="btn btn-lg me-md-4 my-3 mb-md-0 border-0 primary-btn-shadow bg-warning" role="button" (click)="proceedToPayment()">Proceed for Payment</a>
+          </form>
+        </div>
+      </section>
+      
+  </main>

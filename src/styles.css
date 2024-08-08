@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+.diagonal-background {
+    min-height: 100vh !important;
+    background: linear-gradient(
+      135deg,
+      #0077a2 25%,
+      #c0402b 25%,
+      #c0402b 75%,
+      #0077a2 75%
+    ) !important;
+  }
+
+  .form-control{
+    text-transform: uppercase !important;
+  }
