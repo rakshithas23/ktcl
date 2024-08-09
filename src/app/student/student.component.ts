@@ -334,6 +334,10 @@ export class StudentComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
+    if(this.studentForm.value.city===''){
+      alert("Please Select City");
+      return;
+    }
     if (this.studentForm.value.pincode === '') {
       alert('Please Enter Pincode');
       return;

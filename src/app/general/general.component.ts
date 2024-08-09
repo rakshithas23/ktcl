@@ -243,6 +243,10 @@ export class GeneralComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
+    if (this.generalForm.value.city === '') {
+      alert('Please Select City');
+      return;
+    }
     if (this.generalForm.value.pincode === '') {
       alert('Please Enter Pincode');
       return;

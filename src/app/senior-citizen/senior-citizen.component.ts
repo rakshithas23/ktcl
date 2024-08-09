@@ -1,12 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-senior-citizen',
   templateUrl: './senior-citizen.component.html',
-  styleUrls: ['./senior-citizen.component.css']
+  styleUrls: ['./senior-citizen.component.css'],
 })
 export class SeniorCitizenComponent implements OnInit {
   api: any = sessionStorage.getItem('api');
@@ -29,8 +34,14 @@ export class SeniorCitizenComponent implements OnInit {
     this.seniorcitizenForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
       fatherName: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
-      aadharNo: ['', [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')]],
-      mobile: ['', [Validators.required, Validators.pattern('^[6-9]\d{9}$')]],
+      aadharNo: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$'),
+        ],
+      ],
+      mobile: ['', [Validators.required, Validators.pattern('^[6-9]d{9}$')]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
       age: ['', Validators.required],
       gender: ['', Validators.required],
@@ -45,7 +56,7 @@ export class SeniorCitizenComponent implements OnInit {
       photoBase64: ['', Validators.required],
     });
   }
-  
+
   ngOnInit(): void {}
   async validateFileSize(event: Event, fieldName: string) {
     const input = event.target as HTMLInputElement;
@@ -54,22 +65,24 @@ export class SeniorCitizenComponent implements OnInit {
       try {
         const resizedFile = await this.resizeImage(file);
         const fileSizeMB = resizedFile.size / (1024 * 1024); // Convert size to MB
-  
+
         if (fileSizeMB > 1) {
           this.fileErrors = {
             ...this.fileErrors,
             [fieldName]: 'File size must not exceed 1 MB.',
           };
-          this.seniorcitizenForm.get(fieldName)?.setErrors({ invalidSize: true });
-          alert("File size must not exceed 1 MB.");
+          this.seniorcitizenForm
+            .get(fieldName)
+            ?.setErrors({ invalidSize: true });
+          alert('File size must not exceed 1 MB.');
           return;
         } else {
           this.fileErrors = { ...this.fileErrors, [fieldName]: '' };
           this.seniorcitizenForm.get(fieldName)?.setErrors(null);
-  
+
           // Convert the image to Base64
           const base64Image = await this.convertToBase64(resizedFile);
-  
+
           // If the field is 'photo', remove any existing fake path
           if (fieldName === 'photo') {
             // Set the Base64 string to the form control
@@ -78,7 +91,7 @@ export class SeniorCitizenComponent implements OnInit {
             // Handle other fields normally
             this.seniorcitizenForm.get(fieldName)?.setValue(base64Image);
           }
-  
+
           console.log(`${fieldName} Base64 Image:`, base64Image);
         }
       } catch (error) {
@@ -86,8 +99,7 @@ export class SeniorCitizenComponent implements OnInit {
       }
     }
   }
-  
-  
+
   resizeImage(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -100,17 +112,17 @@ export class SeniorCitizenComponent implements OnInit {
           const maxHeight = 1024; // Set max height
           let width = img.width;
           let height = img.height;
-  
+
           if (width > maxWidth) {
             height *= maxWidth / width;
             width = maxWidth;
           }
-  
+
           if (height > maxHeight) {
             width *= maxHeight / height;
             height = maxHeight;
           }
-  
+
           canvas.width = width;
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
@@ -128,7 +140,7 @@ export class SeniorCitizenComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
-  
+
   convertToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -140,7 +152,6 @@ export class SeniorCitizenComponent implements OnInit {
     });
   }
 
-
   onFileSelected(event: any) {
     const fileInput = event.target;
 
@@ -148,7 +159,7 @@ export class SeniorCitizenComponent implements OnInit {
     if (file) {
       const maxSizeInMB = 1;
       const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-  
+
       if (file.size > maxSizeInBytes) {
         alert('The file size exceeds 1 MB. Please Upload a smaller file.');
         fileInput.value = ''; // Clear the file input
@@ -182,12 +193,11 @@ export class SeniorCitizenComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
-  
 
   onSubmit(): void {
     // this.router.navigate(['/payment']);
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
-    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;    
+    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;
     const phoneregex = /^[6-9]\d{9}$/;
     const addressregex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
     const pincoderegex = /^403\d{3}$/;
@@ -240,6 +250,10 @@ export class SeniorCitizenComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
+    if (this.seniorcitizenForm.value.city === '') {
+      alert('Please Select City');
+      return;
+    }
     if (this.seniorcitizenForm.value.pincode === '') {
       alert('Please Enter Pincode');
       return;
@@ -261,7 +275,7 @@ export class SeniorCitizenComponent implements OnInit {
     //   alert('Please Select Address proof type');
     //   return;
     // }
-    
+
     if (this.seniorcitizenForm.value.proofAddress === '') {
       alert('Please Upload Address proof document');
       return;
@@ -274,13 +288,13 @@ export class SeniorCitizenComponent implements OnInit {
       alert('Please Upload Photograph');
       return;
     }
-    if(Object.values(this.fileErrors).some(error => error)){
-      alert("Document Uploaded should be of maximum size 1 MB");
+    if (Object.values(this.fileErrors).some((error) => error)) {
+      alert('Document Uploaded should be of maximum size 1 MB');
       return;
     }
     const data = {
       name: this.seniorcitizenForm.value.name,
-      user_type:"2",
+      user_type: '2',
       fatherName: this.seniorcitizenForm.value.fatherName,
       aadharNo: this.seniorcitizenForm.value.aadharNo,
       mobile: this.seniorcitizenForm.value.mobile,
@@ -296,29 +310,31 @@ export class SeniorCitizenComponent implements OnInit {
       proofAddress: this.seniorcitizenForm.value.proofAddress,
       proofAge: this.seniorcitizenForm.value.proofAge,
       photo: this.seniorcitizenForm.value.photoBase64,
-      user_id: this.user_id
+      user_id: this.user_id,
     };
-    console.log("data",data)
+    console.log('data', data);
 
-
-    this.http.post(this.api + '/add_sc_details', data)
-    .subscribe((result: any) => {
-      let obj = JSON.stringify(result);
-      interface Obj {
-        insertId: any;
-        status: any;
-        message: string;
-        application_number: any;
-      }
-      let res: Obj = JSON.parse(obj);
-      if (res.status === 'success') {
-        alert('Details Submitted Successfully!');
-        this.router.navigate(['/payment'], { queryParams: { application_number: res.application_number } });
-      } else {
-        alert('Failed to Submit,' + res.message);
-        console.log('error');
-      }
-    });
+    this.http
+      .post(this.api + '/add_sc_details', data)
+      .subscribe((result: any) => {
+        let obj = JSON.stringify(result);
+        interface Obj {
+          insertId: any;
+          status: any;
+          message: string;
+          application_number: any;
+        }
+        let res: Obj = JSON.parse(obj);
+        if (res.status === 'success') {
+          alert('Details Submitted Successfully!');
+          this.router.navigate(['/payment'], {
+            queryParams: { application_number: res.application_number },
+          });
+        } else {
+          alert('Failed to Submit,' + res.message);
+          console.log('error');
+        }
+      });
   }
 
   calculateMinDate(): string {
@@ -330,7 +346,7 @@ export class SeniorCitizenComponent implements OnInit {
     );
     return minDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
-  
+
   calculateDefaultDate(): string {
     const today = new Date();
     const defaultDate = new Date(
@@ -340,7 +356,7 @@ export class SeniorCitizenComponent implements OnInit {
     );
     return defaultDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
-  
+
   dateValidator(control: FormControl) {
     const today = new Date();
     const inputDate = new Date(control.value);
@@ -351,7 +367,7 @@ export class SeniorCitizenComponent implements OnInit {
     );
     return inputDate <= minDate ? null : { invalidDate: true };
   }
-  
+
   calculateAge() {
     const dob = this.seniorcitizenForm.get('dob')?.value;
     if (dob) {
@@ -366,17 +382,16 @@ export class SeniorCitizenComponent implements OnInit {
         age--;
       }
       console.log('Age:', age);
-  
+
       // Update the age in the form control
       this.seniorcitizenForm.get('age')?.setValue(age);
-  
+
       // Check if age is less than 60 and show an alert
       if (age < 60) {
-        this.dob = true
+        this.dob = true;
         alert('Age must be minimum 60 years old.');
         return;
       }
     }
   }
-  
 }
