@@ -50,7 +50,7 @@
           <div class="col-12 col-lg-6 pb-3">
             <label>Aadhar Number*</label>
             <input
-              type="text"
+              type="number"
               formControlName="aadharNo"
               class="form-control p-3"
               placeholder="Please Enter Aadhar Number"
@@ -69,7 +69,7 @@
           <div class="col-12 col-lg-6 pb-3">
             <label>Mobile Number*</label>
             <input
-              type="text"
+              type="number"
               formControlName="mobile"
               class="form-control p-3"
               placeholder="Please Enter Mobile Number"
@@ -122,6 +122,7 @@
             <input
               type="text"
               formControlName="age"
+              placeholder="Age"
               class="form-control p-3"
               readonly
             />
@@ -172,7 +173,7 @@
           </div>
         </div>
         <div class="form-group row py-2 text-white">
-          <div class="col-lg-4">
+          <div class="col-lg-4 pb-3">
             <label>State*</label>
             <input
               type="text"
@@ -182,20 +183,20 @@
               readonly
             />
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-4 pb-3">
             <label>City*</label>
-            <input
-              type="text"
-              formControlName="city"
-              value="Panaji"
-              class="form-control p-3"
-              readonly
-            />
+            <select formControlName="city" class="form-control p-3">
+              <option value="">Select City</option>
+              <option value="Panaji">Panaji</option>
+              <option value="Margoa">Margoa</option>
+              <option value="Mapusa">Mapusa</option>
+              <option value="Vasco">Vasco</option>
+            </select>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-4 pb-3">
             <label>Pincode*</label>
             <input
-              type="text"
+              type="number"
               formControlName="pincode"
               class="form-control p-3"
               placeholder="Please Enter Pincode"
@@ -213,8 +214,8 @@
           </div>
         </div>
         <div class="form-group row py-2 text-white">
-          <div class="col-lg-4">
-            <label>Email Address</label>
+          <div class="col-lg-4 pb-3">
+            <label>Email Address*</label>
             <input
               type="email"
               formControlName="email"
@@ -235,8 +236,8 @@
         </div>
 
         <div class="form-group row text-white d-lg-flex">
-          <div class="col-12 col-lg-4">
-            <label for="address_proof_type">Address Proof Type</label>
+          <!-- <div class="col-12 col-lg-4 pb-3">
+            <label for="address_proof_type">Address Proof Type*</label>
             <select
               formControlName="address_proof_type"
               class="form-control p-3"
@@ -248,49 +249,97 @@
               <option value="Voter ID">Voter ID</option>
               <option value="PAN">PAN</option>
               <option value="Aadhar Card">Aadhar Card</option>
+              <option value="Birth Certificate">Birth Certificate</option>
+              <option value="Driving License">Driving License</option>
+              <option value="Bank PassBook">Bank PassBook</option>
+              <option value="Cylinder Bill">Cylinder Bill</option>
             </select>
             <div
               *ngIf="
-              seniorcitizenForm.get('address_proof_type')?.invalid &&
-              seniorcitizenForm.get('address_proof_type')?.touched
+                seniorcitizenForm.get('address_proof_type')?.invalid &&
+                seniorcitizenForm.get('address_proof_type')?.touched
               "
               class="text-warning"
               style="font-weight: 800"
             >
               Address Proof Type is required
             </div>
-          </div>
+          </div> -->
           <div class="col-12 col-lg-4 pb-3">
-            <label>Upload Address Proof Document</label>
-            <input type="file" class="form-control p-3"accept=".pdf, .jpg, .jpeg, .png"  (change)="validateFileSize($event, 'proofAddress')" />
-            <small>Document Size has to be less than 1MB.</small>
-            <div *ngIf="fileErrors['proofAddress']" class="text-warning" style="font-weight: 800;">{{ fileErrors['proofAddress'] }}</div>
+            <label>Upload Address Proof*</label>
+            <input
+              type="file"
+              class="form-control p-3"
+              accept=".pdf, .jpg, .jpeg, .png"
+              (change)="validateFileSize($event, 'proofAddress')"
+            />
+            <small
+              >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
+              than 1MB.</small
+            >
+            <div
+              *ngIf="fileErrors['proofAddress']"
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              {{ fileErrors["proofAddress"] }}
+            </div>
           </div>
           <input type="hidden" formControlName="proofAddress" />
 
           <div class="col-12 col-lg-4 pb-3">
-            <label>Upload Age Proof</label>
-            <input type="file"  class="form-control p-3" accept=".pdf, .jpg, .jpeg, .png" (change)="validateFileSize($event, 'proofAge')" />
-            <small>Document Size has to be less than 1MB.</small>
-            <div *ngIf="fileErrors['proofAge']" class="text-warning" style="font-weight: 800;">{{ fileErrors['proofAge'] }}</div>
+            <label>Upload Age Proof*</label>
+            <input
+              type="file"
+              class="form-control p-3"
+              accept=".pdf, .jpg, .jpeg, .png"
+              (change)="validateFileSize($event, 'proofAge')"
+            />
+            <small
+              >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
+              than 1MB.</small
+            >
+            <div
+              *ngIf="fileErrors['proofAge']"
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              {{ fileErrors["proofAge"] }}
+            </div>
           </div>
           <input type="hidden" formControlName="proofAge" />
 
-          <div class="form-group col-lg-4 text-white">
-            <label>Photograph</label>
-            <input type="file" class="form-control p-3" accept="image/*" capture="user" (change)="onFileSelected($event)" />
-            <small>Document Size has to be less than 1MB.</small>
-            <div *ngIf="fileErrors['photo']" class="text-warning" style="font-weight: 800;">{{ fileErrors['photo'] }}</div>
+          <div class="form-group col-lg-4 pb-3 text-white">
+            <label>Upload Photograph*</label>
+            <input
+              type="file"
+              class="form-control p-3"
+              accept="image/*"
+              capture="user"
+              (change)="onFileSelected($event)"
+            />
+            <small
+              >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
+              than 1MB.</small
+            >
+            <div
+              *ngIf="fileErrors['photo']"
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              {{ fileErrors["photo"] }}
+            </div>
           </div>
           <input type="hidden" formControlName="photoBase64" />
-
-          
-          
         </div>
         <button type="submit" class="btn btn-lg btn-warning m-2">
           Make Payment
         </button>
       </form>
     </div>
+
+    <!--Footer-->
+    <app-footer></app-footer>
+    <!--END-->
   </section>
 </main>

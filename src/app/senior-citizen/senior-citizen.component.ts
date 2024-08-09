@@ -29,17 +29,17 @@ export class SeniorCitizenComponent implements OnInit {
     this.seniorcitizenForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
       fatherName: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
-      aadharNo: ['', [Validators.required, Validators.pattern('\\d{12}')]],
-      mobile: ['', [Validators.required, Validators.pattern('\\d{10}')]],
+      aadharNo: ['', [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')]],
+      mobile: ['', [Validators.required, Validators.pattern('^[6-9]\d{9}$')]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
       age: ['', Validators.required],
       gender: ['', Validators.required],
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
-      city: ['Panaji', Validators.required],
+      city: ['', Validators.required],
       pincode: ['', [Validators.required, Validators.pattern('^403\\d{3}$')]],
       email: ['', [Validators.email]],
-      address_proof_type: ['',[Validators.required]],
+      // address_proof_type: ['',[Validators.required]],
       proofAddress: ['', Validators.required],
       proofAge: ['', Validators.required],
       photoBase64: ['', Validators.required],
@@ -61,6 +61,8 @@ export class SeniorCitizenComponent implements OnInit {
             [fieldName]: 'File size must not exceed 1 MB.',
           };
           this.seniorcitizenForm.get(fieldName)?.setErrors({ invalidSize: true });
+          alert("File size must not exceed 1 MB.");
+          return;
         } else {
           this.fileErrors = { ...this.fileErrors, [fieldName]: '' };
           this.seniorcitizenForm.get(fieldName)?.setErrors(null);
@@ -140,8 +142,19 @@ export class SeniorCitizenComponent implements OnInit {
 
 
   onFileSelected(event: any) {
+    const fileInput = event.target;
+
     const file: File = event.target.files[0];
     if (file) {
+      const maxSizeInMB = 1;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+  
+      if (file.size > maxSizeInBytes) {
+        alert('The file size exceeds 1 MB. Please Upload a smaller file.');
+        fileInput.value = ''; // Clear the file input
+        this.seniorcitizenForm.get('photoBase64')?.setValue('');
+        return;
+      }
       this.photo(file)
         .then((base64: string) => {
           // Do something with the base64 string, e.g., set it in a form control or send it to the backend
@@ -174,7 +187,7 @@ export class SeniorCitizenComponent implements OnInit {
   onSubmit(): void {
     // this.router.navigate(['/payment']);
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
-    const aadharegex = /^\d{12}$/;
+    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;    
     const phoneregex = /^[6-9]\d{9}$/;
     const addressregex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
     const pincoderegex = /^403\d{3}$/;
@@ -211,8 +224,8 @@ export class SeniorCitizenComponent implements OnInit {
     if (this.seniorcitizenForm.value.dob === '') {
       alert('Please Enter Date of Birth');
       return;
-    } else if (this.dob === true) {
-      alert('Date of Birth has to atleast 60 years.');
+    } else if (this.seniorcitizenForm.value.age < 60) {
+      alert('Date of Birth has to be atleast 60 years.');
       return;
     }
     if (this.seniorcitizenForm.value.gender === '') {
@@ -244,10 +257,10 @@ export class SeniorCitizenComponent implements OnInit {
       return;
     }
 
-    if (this.seniorcitizenForm.value.address_proof_type === '') {
-      alert('Please Select Address proof type');
-      return;
-    }
+    // if (this.seniorcitizenForm.value.address_proof_type === '') {
+    //   alert('Please Select Address proof type');
+    //   return;
+    // }
     
     if (this.seniorcitizenForm.value.proofAddress === '') {
       alert('Please Upload Address proof document');
@@ -272,7 +285,7 @@ export class SeniorCitizenComponent implements OnInit {
       aadharNo: this.seniorcitizenForm.value.aadharNo,
       mobile: this.seniorcitizenForm.value.mobile,
       dob: this.seniorcitizenForm.value.dob,
-      age: this.seniorcitizenForm.value.age,
+      age: this.seniorcitizenForm.value.age.toString(),
       gender: this.seniorcitizenForm.value.gender,
       address: this.seniorcitizenForm.value.address,
       state: this.seniorcitizenForm.value.state,
@@ -359,6 +372,7 @@ export class SeniorCitizenComponent implements OnInit {
   
       // Check if age is less than 60 and show an alert
       if (age < 60) {
+        this.dob = true
         alert('Age must be minimum 60 years old.');
         return;
       }

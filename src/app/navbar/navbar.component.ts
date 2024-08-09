@@ -9,15 +9,13 @@ import { Router, NavigationEnd } from '@angular/router';
 export class navbarComponent implements OnInit {
   currentRoute: string = '';
 
-  constructor(private router: Router) {}
-
-  ngOnInit(): void {
-    // Subscribe to router events to capture the current route
-    this.router.events.subscribe(event => {
+  constructor(private router: Router) {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.currentRoute = event.urlAfterRedirects;
-        console.log("this.currentRoute",this.currentRoute)
+        console.log('Current Route:', this.currentRoute); 
       }
     });
   }
+  ngOnInit(): void {}
 }

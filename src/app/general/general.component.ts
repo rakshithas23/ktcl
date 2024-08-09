@@ -34,17 +34,17 @@ export class GeneralComponent implements OnInit {
     this.generalForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
       fatherName: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
-      aadharNo: ['', [Validators.required, Validators.pattern('\\d{12}')]],
-      mobile: ['', [Validators.required, Validators.pattern('\\d{10}')]],
+      aadharNo: ['', [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')]],
+      mobile: ['', [Validators.required, Validators.pattern('^[6-9]\d{9}$')]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
       age: ['', Validators.required],
       gender: ['', Validators.required],
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
-      city: ['Panaji', Validators.required],
+      city: ['', Validators.required],
       pincode: ['', [Validators.required, Validators.pattern('^403\\d{3}$')]],
       email: ['', [Validators.email]],
-      address_proof_type: ['',[Validators.required]],
+      // address_proof_type: ['', [Validators.required]],
       proofAddress: ['', Validators.required],
       photoBase64: ['', Validators.required],
     });
@@ -59,20 +59,22 @@ export class GeneralComponent implements OnInit {
       try {
         const resizedFile = await this.resizeImage(file);
         const fileSizeMB = resizedFile.size / (1024 * 1024); // Convert size to MB
-  
+
         if (fileSizeMB > 1) {
           this.fileErrors = {
             ...this.fileErrors,
             [fieldName]: 'File size must not exceed 1 MB.',
           };
           this.generalForm.get(fieldName)?.setErrors({ invalidSize: true });
+          alert("File size must not exceed 1 MB.");
+          return;
         } else {
           this.fileErrors = { ...this.fileErrors, [fieldName]: '' };
           this.generalForm.get(fieldName)?.setErrors(null);
-  
+
           // Convert the image to Base64
           const base64Image = await this.convertToBase64(resizedFile);
-  
+
           // If the field is 'photo', remove any existing fake path
           if (fieldName === 'photo') {
             // Set the Base64 string to the form control
@@ -81,7 +83,7 @@ export class GeneralComponent implements OnInit {
             // Handle other fields normally
             this.generalForm.get(fieldName)?.setValue(base64Image);
           }
-  
+
           console.log(`${fieldName} Base64 Image:`, base64Image);
         }
       } catch (error) {
@@ -89,9 +91,7 @@ export class GeneralComponent implements OnInit {
       }
     }
   }
-  
-  
-  
+
   resizeImage(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -104,17 +104,17 @@ export class GeneralComponent implements OnInit {
           const maxHeight = 1024; // Set max height
           let width = img.width;
           let height = img.height;
-  
+
           if (width > maxWidth) {
             height *= maxWidth / width;
             width = maxWidth;
           }
-  
+
           if (height > maxHeight) {
             width *= maxHeight / height;
             height = maxHeight;
           }
-  
+
           canvas.width = width;
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
@@ -132,7 +132,7 @@ export class GeneralComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
-  
+
   convertToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -144,10 +144,22 @@ export class GeneralComponent implements OnInit {
     });
   }
 
-
   onFileSelected(event: any) {
+    const fileInput = event.target;
+    console.log("fileInput",fileInput)
+
     const file: File = event.target.files[0];
     if (file) {
+      const maxSizeInMB = 1;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+  
+      if (file.size > maxSizeInBytes) {
+        alert('The file size exceeds 1 MB. Please Upload a smaller file.');
+        fileInput.value = ''; // Clear the file input
+        this.generalForm.get('photoBase64')?.setValue('');
+        return;
+      }
+  
       this.photo(file)
         .then((base64: string) => {
           // Do something with the base64 string, e.g., set it in a form control or send it to the backend
@@ -156,7 +168,7 @@ export class GeneralComponent implements OnInit {
           const base64WithPrefix = `data:${mimeType};base64,${base64}`;
           // console.log(base64WithPrefix);
           this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
-          console.log(this.generalForm.value.photoBase64)
+          console.log(this.generalForm.value.photoBase64);
         })
         .catch((error) => {
           console.error('Error converting file to Base64:', error);
@@ -178,7 +190,7 @@ export class GeneralComponent implements OnInit {
   }
   onSubmit(): void {
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
-    const aadharegex = /^\d{12}$/;
+    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;    
     const phoneregex = /^[6-9]\d{9}$/;
     const addressregex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
     const pincoderegex = /^403\d{3}$/;
@@ -215,9 +227,8 @@ export class GeneralComponent implements OnInit {
     if (this.generalForm.value.dob === '') {
       alert('Please Enter Date of Birth');
       return;
-    }
-    else if (this.dob === true) {
-      alert('Date of Birth has to be 5 years.');
+    } else if (this.generalForm.value.age < 5) {
+      alert('Date of Birth has to be minimum 5 years.');
       return;
     }
     if (this.generalForm.value.gender === '') {
@@ -249,6 +260,11 @@ export class GeneralComponent implements OnInit {
       return;
     }
 
+    // if (this.generalForm.value.address_proof_type === '') {
+    //   alert('Please Select Address Proof Type');
+    //   return;
+    // }
+
     if (this.generalForm.value.proofAddress === '') {
       alert('Please Upload Address proof document');
       return;
@@ -264,12 +280,12 @@ export class GeneralComponent implements OnInit {
     }
     const data = {
       name: this.generalForm.value.name,
-      user_type: "3",
+      user_type: '3',
       fatherName: this.generalForm.value.fatherName,
       aadharNo: this.generalForm.value.aadharNo,
       mobile: this.generalForm.value.mobile,
       dob: this.generalForm.value.dob,
-      age: this.generalForm.value.age,
+      age: this.generalForm.value.age.toString(),
       gender: this.generalForm.value.gender,
       address: this.generalForm.value.address,
       state: this.generalForm.value.state,
@@ -279,11 +295,10 @@ export class GeneralComponent implements OnInit {
       proofAddressType: this.generalForm.value.address_proof_type,
       proofAddress: this.generalForm.value.proofAddress,
       photo: this.generalForm.value.photoBase64,
-      user_id: this.user_id
-
+      user_id: this.user_id,
     };
 
-    console.log("data",data)
+    console.log('data', data);
 
     this.http
       .post(this.api + '/add_gen_details', data)

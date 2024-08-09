@@ -1,31 +1,37 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-success',
   templateUrl: './success.component.html',
-  styleUrls: ['./success.component.css']
+  styleUrls: ['./success.component.css'],
 })
 export class SuccessComponent implements OnInit {
+  successForm: FormGroup;
+  applicationNumber: any;
   ngOnInit(): void {
-      
+    this.route.queryParams.subscribe((params) => {
+      this.applicationNumber = params['application_number'];
+    });
+    this.successForm.patchValue({ applicationNumber: this.applicationNumber });
+
   }
-  mobile:string = "";
-  password:any;
-  // api:string="http://103.148.157.47:8081";
-//   api:string="https://atte.stepnstones.in" 
-  // api:string="http://localhost:8081"
-  submitted = false; 
-  // private cookieValue:string;
 
-  spinnerCheck:boolean = false;
-  showError:boolean = false;
-  errorMsg:string = "";
-  
-  
-
-  
-
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.successForm = this.fb.group({
+      applicationNumber: [''],
+    });
+  }
 }

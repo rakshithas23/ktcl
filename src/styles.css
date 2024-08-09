@@ -13,3 +13,8 @@
   .form-control{
     text-transform: uppercase !important;
   }
+
+  label{
+    font-size: 20px;
+    padding-bottom: 10px;
+  }

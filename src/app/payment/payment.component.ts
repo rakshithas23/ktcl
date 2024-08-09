@@ -75,7 +75,7 @@ export class paymentComponent implements OnInit {
           'response.razorpay_payment_id',
           response.razorpay_payment_id
         );
-        this.router.navigate(['/success']);
+        this.router.navigate(['/success'], { queryParams: { application_number:this.applicationNumber } });
       },
       prefill: {
         name: '',

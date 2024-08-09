@@ -7,8 +7,13 @@
         <h1 class="text-center text-white pt-5 mt-5">
            Successfully Registered !
         </h1>
-        <h3 class="text-center text-white">Your Application Number : </h3>
-      
+
+        <form [formGroup]="successForm">
+          <h3 class="text-center text-white py-5">Your Application Number : <input type="text" class="form-control p-3 m-1" formControlName="applicationNumber" readonly/></h3>
+        </form>
       </div>
+
+      <app-footer style="position: fixed; bottom: 0px !important; width: 100%;"></app-footer>
+
     </section>
   </main>

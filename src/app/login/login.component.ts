@@ -11,8 +11,8 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
-  // api:string="https://atte.stepnstones.in"
-  api: string = 'https://ktclitms.com/buspass/API/Mob_users';
+  // api: string = 'https://ktclitms.com/buspass/API/Mob_users';
+  api: string = 'https://goa.smarttransit.in/API/Mob_users';
   constructor(
     private fb: FormBuilder,
     private cookieService: CookieService,

@@ -1,281 +1,313 @@
 <main class="main" id="top">
-    <!--NAVBAR-->
-    <app-navbar></app-navbar>
-    <!--END-->
-    <section class="diagonal-background pt-5">
-      <div class="container py-5">
-        <h1 class="text-center text-white pt-5">
-         General Card Registration Form
-        </h1>
-        <form [formGroup]="generalForm" (ngSubmit)="onSubmit()">
-          <div class="form-group row py-2 text-white">
-            <div class="col-12 col-lg-6 pb-3">
-              <label>Name*</label>
-              <input
-                type="text"
-                formControlName="name"
-                class="form-control p-3"
-                placeholder="Please Enter Name"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('name')?.invalid &&
-                  generalForm.get('name')?.touched
-                "
-                class="text-warning font-weight-bold"
-                style="font-weight: 800"
-              >
-                Please Enter Your Name
-              </div>
-            </div>
-            <div class="col-12 col-lg-6 pb-3">
-              <label>Father Name*</label>
-              <input
-                type="text"
-                formControlName="fatherName"
-                class="form-control p-3"
-                placeholder="Please Enter Father Name"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('fatherName')?.invalid &&
-                  generalForm.get('fatherName')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Please Enter Your Father's Name
-              </div>
-            </div>
-            <div class="col-12 col-lg-6 pb-3">
-              <label>Aadhar Number*</label>
-              <input
-                type="text"
-                formControlName="aadharNo"
-                class="form-control p-3"
-                placeholder="Please Enter Aadhar Number"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('aadharNo')?.invalid &&
-                  generalForm.get('aadharNo')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Invalid Aadhar Number
-              </div>
-            </div>
-            <div class="col-12 col-lg-6 pb-3">
-              <label>Mobile Number*</label>
-              <input
-                type="text"
-                formControlName="mobile"
-                class="form-control p-3"
-                placeholder="Please Enter Mobile Number"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('mobile')?.invalid &&
-                  generalForm.get('mobile')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Invalid Mobile Number
-              </div>
-            </div>
-          </div>
-          <div class="form-group row py-2 text-white">
-            <h2 class="text-start text-white py-3">Personal Information</h2>
-            <div class="col-lg-4 pb-3">
-              <label>Date of Birth*</label>
-              <input
-                type="date"
-                formControlName="dob"
-                class="form-control p-3"
-                (change)="calculateAge()"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('dob')?.hasError('required') &&
-                  generalForm.get('dob')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Date of Birth is required
-              </div>
-              
-            </div>
-            <div class="col-lg-4 pb-3">
-              <label>Age*</label>
-              <input
-                type="text"
-                formControlName="age"
-                class="form-control p-3"
-                readonly
-              />
-            </div>
-            <div class="col-lg-4 pb-3">
-              <label>Gender*</label>
-              <div class="custom-select-wrapper">
-                <select
-                  formControlName="gender"
-                  class="form-control p-3 custom-select"
-                >
-                  <option value="">Select</option>
-                  <option value="1">Male</option>
-                  <option value="2">Female</option>
-                  <option value="3">Other</option>
-                </select>
-                <i class="fa fa-caret-down custom-select-icon"></i>
-              </div>
-              <div
-                *ngIf="
-                  generalForm.get('gender')?.invalid &&
-                  generalForm.get('gender')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Gender is required
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6 pb-3 text-white">
-            <label>Communication Address*</label>
-            <textarea
-              formControlName="address"
+  <!--NAVBAR-->
+  <app-navbar></app-navbar>
+  <!--END-->
+  <section class="diagonal-background pt-5">
+    <div class="container py-5">
+      <h1 class="text-center text-white pt-5">
+        General Card Registration Form
+      </h1>
+      <form [formGroup]="generalForm" (ngSubmit)="onSubmit()">
+        <div class="form-group row py-2 text-white">
+          <div class="col-12 col-lg-6 pb-3">
+            <label>Name*</label>
+            <input
+              type="text"
+              formControlName="name"
               class="form-control p-3"
-              rows="3"
-              placeholder="Please Enter Address"
-            ></textarea>
+              placeholder="Please Enter Name"
+            />
             <div
               *ngIf="
-                generalForm.get('address')?.invalid &&
-                generalForm.get('address')?.touched
+                generalForm.get('name')?.invalid &&
+                generalForm.get('name')?.touched
+              "
+              class="text-warning font-weight-bold"
+              style="font-weight: 800"
+            >
+              Please Enter Your Name
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 pb-3">
+            <label>Father Name*</label>
+            <input
+              type="text"
+              formControlName="fatherName"
+              class="form-control p-3"
+              placeholder="Please Enter Father Name"
+            />
+            <div
+              *ngIf="
+                generalForm.get('fatherName')?.invalid &&
+                generalForm.get('fatherName')?.touched
               "
               class="text-warning"
               style="font-weight: 800"
             >
-              Address is required
+              Please Enter Your Father's Name
             </div>
           </div>
-          <div class="form-group row py-2 text-white">
-            <div class="col-lg-4">
-              <label>State*</label>
-              <input
-                type="text"
-                formControlName="state"
-                class="form-control p-3"
-                readonly
-              />
-            </div>
-            <div class="col-lg-4">
-              <label>City*</label>
-              <input
-                type="text"
-                formControlName="city"
-                class="form-control p-3"
-                readonly
-              />
-            </div>
-            <div class="col-lg-4">
-              <label>Pincode*</label>
-              <input
-                type="text"
-                formControlName="pincode"
-                class="form-control p-3"
-                placeholder="Please Enter Pincode"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('pincode')?.invalid &&
-                  generalForm.get('pincode')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Invalid Pincode
-              </div>
+          <div class="col-12 col-lg-6 pb-3">
+            <label>Aadhar Number*</label>
+            <input
+              type="number"
+              formControlName="aadharNo"
+              class="form-control p-3"
+              placeholder="Please Enter Aadhar Number"
+            />
+            <div
+              *ngIf="
+                generalForm.get('aadharNo')?.invalid &&
+                generalForm.get('aadharNo')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Invalid Aadhar Number
             </div>
           </div>
-          <div class="form-group row py-2 text-white">
-            <div class="col-lg-4">
-              <label>Email Address</label>
-              <input
-                type="email"
-                formControlName="email"
-                class="form-control p-3"
-                placeholder="Please Enter Email Address"
-              />
-              <div
-                *ngIf="
-                  generalForm.get('email')?.invalid &&
-                  generalForm.get('email')?.touched
-                "
-                class="text-warning"
-                style="font-weight: 800"
-              >
-                Invalid Email
-              </div>
+          <div class="col-12 col-lg-6 pb-3">
+            <label>Mobile Number*</label>
+            <input
+              type="number"
+              formControlName="mobile"
+              class="form-control p-3"
+              placeholder="Please Enter Mobile Number"
+            />
+            <div
+              *ngIf="
+                generalForm.get('mobile')?.invalid &&
+                generalForm.get('mobile')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Invalid Mobile Number
             </div>
           </div>
-  
-          <div class="">
-            <div class="form-group row text-white d-lg-flex">
-              <div class="col-12 col-lg-4">
-                <label for="address_proof_type">Address Proof Type</label>
-                <select
-                  formControlName="address_proof_type"
-                  class="form-control p-3"
-                  id="address_proof_type"
-                >
-                  <option value="">Select Address Proof Type</option>
-                  <option value="Electricity Bill">Electricity Bill</option>
-                  <option value="Passport">Passport</option>
-                  <option value="Voter ID">Voter ID</option>
-                  <option value="PAN">PAN</option>
-                  <option value="Aadhar Card">Aadhar Card</option>
-                </select>
-                <div
-                  *ngIf="
-                    generalForm.get('address_proof_type')?.invalid &&
-                    generalForm.get('address_proof_type')?.touched
-                  "
-                  class="text-warning"
-                  style="font-weight: 800"
-                >
-                  Address Proof Type is required
-                </div>
-              </div>
-              <div class="col-12 col-lg-4 pb-3">
-                <label>Upload Address Proof Document</label>
-                <input type="file" class="form-control p-3" accept=".pdf, .jpg, .jpeg, .png" (change)="validateFileSize($event, 'proofAddress')" />
-                <small>Document Size has to be less than 1MB.</small>
-                <div *ngIf="fileErrors['proofAddress']" class="text-warning" style="font-weight: 800;">{{ fileErrors['proofAddress'] }}</div>
-              </div>
-
-              <input type="hidden" formControlName="proofAddress" />
-
-             
-              <div class="col-lg-4 text-white">
-                <label>Photograph</label>
-                <input type="file" class="form-control p-3" accept="image/*" capture="user" (change)="onFileSelected($event)" />
-                <small>Document Size has to be less than 1MB.</small>
-                <div *ngIf="fileErrors['photo']" class="text-warning" style="font-weight: 800;">{{ fileErrors['photo'] }}</div>
-              </div>
-              <input type="hidden" formControlName="photoBase64" />
-
-              
-              
-            </div>
         </div>
-          <button type="submit" class="btn btn-lg btn-warning m-2">
-            Make Payment
-          </button>
-        </form>
-      </div>
-    </section>
-  </main>
+        <div class="form-group row py-2 text-white">
+          <h2 class="text-start text-white py-3">Personal Information</h2>
+          <div class="col-lg-4 pb-3">
+            <label>Date of Birth*</label>
+            <input
+              type="date"
+              formControlName="dob"
+              class="form-control p-3"
+              (change)="calculateAge()"
+            />
+            <div
+              *ngIf="
+                generalForm.get('dob')?.hasError('required') &&
+                generalForm.get('dob')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Date of Birth is required
+            </div>
+          </div>
+          <div class="col-lg-4 pb-3">
+            <label>Age*</label>
+            <input
+              type="text"
+              formControlName="age"
+              placeholder="Age"
+              class="form-control p-3"
+              readonly
+            />
+          </div>
+          <div class="col-lg-4 pb-3">
+            <label>Gender*</label>
+            <div class="custom-select-wrapper">
+              <select
+                formControlName="gender"
+                class="form-control p-3 custom-select"
+              >
+                <option value="">Select</option>
+                <option value="1">Male</option>
+                <option value="2">Female</option>
+                <option value="3">Other</option>
+              </select>
+              <i class="fa fa-caret-down custom-select-icon"></i>
+            </div>
+            <div
+              *ngIf="
+                generalForm.get('gender')?.invalid &&
+                generalForm.get('gender')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Gender is required
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 pb-3 text-white">
+          <label>Communication Address*</label>
+          <textarea
+            formControlName="address"
+            class="form-control p-3"
+            rows="3"
+            placeholder="Please Enter Address"
+          ></textarea>
+          <div
+            *ngIf="
+              generalForm.get('address')?.invalid &&
+              generalForm.get('address')?.touched
+            "
+            class="text-warning"
+            style="font-weight: 800"
+          >
+            Address is required
+          </div>
+        </div>
+        <div class="form-group row py-2 text-white">
+          <div class="col-lg-4 pb-3">
+            <label>State*</label>
+            <input
+              type="text"
+              formControlName="state"
+              class="form-control p-3"
+              value="Goa"
+              readonly
+            />
+          </div>
+          <div class="col-lg-4 pb-3">
+            <label>City*</label>
+            <select formControlName="city" class="form-control p-3">
+              <option value="">Select City</option>
+              <option value="Panaji">Panaji</option>
+              <option value="Margoa">Margoa</option>
+              <option value="Mapusa">Mapusa</option>
+              <option value="Vasco">Vasco</option>
+            </select>
+          </div>
+          <div class="col-lg-4 pb-3">
+            <label>Pincode*</label>
+            <input
+              type="number"
+              formControlName="pincode"
+              class="form-control p-3"
+              placeholder="Please Enter Pincode"
+            />
+            <div
+              *ngIf="
+                generalForm.get('pincode')?.invalid &&
+                generalForm.get('pincode')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Invalid Pincode
+            </div>
+          </div>
+        </div>
+        <div class="form-group row py-2 text-white">
+          <div class="col-lg-4 pb-3">
+            <label>Email Address*</label>
+            <input
+              type="email"
+              formControlName="email"
+              class="form-control p-3"
+              placeholder="Please Enter Email Address"
+            />
+            <div
+              *ngIf="
+                generalForm.get('email')?.invalid &&
+                generalForm.get('email')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Invalid Email
+            </div>
+          </div>
+        </div>
+        <div class="form-group row text-white d-lg-flex">
+          <!-- <div class="col-12 col-lg-4 pb-3">
+            <label for="address_proof_type">Address Proof Type*</label>
+            <select
+              formControlName="address_proof_type"
+              class="form-control p-3"
+              id="address_proof_type"
+            >
+              <option value="">Select Address Proof Type</option>
+              <option value="Electricity Bill">Electricity Bill</option>
+              <option value="Passport">Passport</option>
+              <option value="Voter ID">Voter ID</option>
+              <option value="PAN">PAN</option>
+              <option value="Aadhar Card">Aadhar Card</option>
+              <option value="Birth Certificate">Birth Certificate</option>
+              <option value="Driving License">Driving License</option>
+              <option value="Bank PassBook">Bank PassBook</option>
+              <option value="Cylinder Bill">Cylinder Bill</option>
+            </select>
+            <div
+              *ngIf="
+                generalForm.get('address_proof_type')?.invalid &&
+                generalForm.get('address_proof_type')?.touched
+              "
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              Address Proof Type is required
+            </div>
+          </div> -->
+          <div class="col-12 col-lg-4 pb-3">
+            <label>Upload Address Proof*</label>
+            <input
+              type="file"
+              class="form-control p-3"
+              accept=".pdf, .jpg, .jpeg, .png"
+              (change)="validateFileSize($event, 'proofAddress')"
+            />
+            <small
+              >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
+              than 1MB.</small
+            >
+            <div
+              *ngIf="fileErrors['proofAddress']"
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              {{ fileErrors["proofAddress"] }}
+            </div>
+          </div>
+
+          <input type="hidden" formControlName="proofAddress" />
+
+          <div class="col-lg-4 pb-3 text-white">
+            <label>Upload Photograph*</label>
+            <input
+              type="file"
+              class="form-control p-3"
+              accept="image/*"
+              capture="user"
+              (change)="onFileSelected($event)"
+            />
+            <small
+              >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
+              than 1MB.</small
+            >
+            <div
+              *ngIf="fileErrors['photo']"
+              class="text-warning"
+              style="font-weight: 800"
+            >
+              {{ fileErrors["photo"] }}
+            </div>
+          </div>
+          <input type="hidden" formControlName="photoBase64" />
+        </div>
+        <button type="submit" class="btn btn-lg btn-warning m-2">
+          Make Payment
+        </button>
+      </form>
+    </div>
+
+    <!--Footer-->
+    <app-footer></app-footer>
+    <!--END-->
+  </section>
+</main>

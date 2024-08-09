@@ -3,10 +3,10 @@
    <app-navbar></app-navbar>
     <!--END-->
     <section class="diagonal-background pt-5">
-        <div class="container py-5">
+        <div class="container py-5 d-flex justify-content-center align-items-center">
           <form [formGroup]="paymentForm">
             <div class="row">
-              <h3 class="text-center text-white py-5">Your Application Number : <input type="text" class="form-control p-3" formControlName="applicationNumber" readonly/></h3>
+              <h3 class="text-center text-white py-5">Your Application Number : <input type="text" class="form-control p-3 m-1" formControlName="applicationNumber" readonly/></h3>
 
               <div class="form-group pb-3 col-12 col-lg-4 pb-3">
                 <label for="cardBalance" class="text-white" style="font-size: 22px;">Minimum Card Balance</label>
@@ -24,6 +24,9 @@
             <a class="btn btn-lg me-md-4 my-3 mb-md-0 border-0 primary-btn-shadow bg-warning" role="button" (click)="proceedToPayment()">Proceed for Payment</a>
           </form>
         </div>
+
+        <app-footer style="position: fixed; bottom: 0px !important; width: 100%;"></app-footer>
+
       </section>
       
   </main>
