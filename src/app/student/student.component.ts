@@ -4,9 +4,12 @@ import {
   FormControl,
   FormBuilder,
   Validators,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-student',
@@ -14,6 +17,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./student.component.css'],
 })
 export class StudentComponent implements OnInit {
+  private apiUrl = 'http://securesmsc.com/httpapi/send';
   api: any = sessionStorage.getItem('api');
   user_id: any = sessionStorage.getItem('user_id');
   imageBase64Data: string | null = null;
@@ -26,7 +30,7 @@ export class StudentComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
   ) {
     this.minDate = this.calculateMinDate();
     this.defaultDob = this.calculateDefaultDate();
@@ -34,15 +38,18 @@ export class StudentComponent implements OnInit {
     this.studentForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
       fatherName: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
-      aadharNo: ['', [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')]],
-      mobile: ['', [Validators.required, Validators.pattern('^[6-9]\d{9}$')]],
+      aadharNo: [
+        '',
+        [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{11}$')],
+      ],
+      mobile: ['', [Validators.required]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
       age: ['', Validators.required],
       gender: ['', Validators.required],
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
       city: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^403\\d{3}$')]],
+      pincode: ['', [Validators.required, Validators.pattern('^\d{6}$')]],
       email: ['', [Validators.email]],
       institution_type: ['', Validators.required],
       inst_address: ['', Validators.required],
@@ -281,10 +288,10 @@ export class StudentComponent implements OnInit {
 
   onSubmit(): void {
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
-    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;    
+    const aadharegex = /^[2-9]{1}[0-9]{11}$/;
     const phoneregex = /^[6-9]\d{9}$/;
     const addressregex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
-    const pincoderegex = /^403\d{3}$/;
+    const pincoderegex = /^\d{6}$/;
     const emailregex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (this.studentForm.value.name === '') {
@@ -334,8 +341,16 @@ export class StudentComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
-    if(this.studentForm.value.city===''){
-      alert("Please Select City");
+    if(this.studentForm.value.state === ''){
+      alert("Please Select State");
+      return;
+    }
+    if (this.studentForm.value.city === '') {
+      alert('Please Enter City');
+      return;
+    }
+    else if (!nameregex.test(this.studentForm.value.city)) {
+      alert('Please Enter a valid city.');
       return;
     }
     if (this.studentForm.value.pincode === '') {
@@ -405,9 +420,16 @@ export class StudentComponent implements OnInit {
       user_id: this.user_id,
     };
     console.log('data', data);
-    this.http
-      .post(this.api + '/add_student_details', data)
-      .subscribe((result: any) => {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+
+    const options = {
+      headers: headers,
+    };
+
+    this.http.post(this.api + '/add_student_details', data, options).subscribe(
+      (result: any) => {
         let obj = JSON.stringify(result);
         interface Obj {
           insertId: any;
@@ -418,14 +440,75 @@ export class StudentComponent implements OnInit {
         let res: Obj = JSON.parse(obj);
         if (res.status === 'success') {
           alert('Details Submitted Successfully!');
-          this.router.navigate(['/payment'], {
-            queryParams: { application_number: res.application_number },
+
+          const app_number = res.message;
+
+          // this.router.navigate(['/success'], {
+          //   queryParams: { application_number: app_number },
+          // });
+          this.router.navigate(['/success'], {
+            queryParams: { application_number: res.message },
           });
         } else {
           alert('Failed to Submit,' + res.message);
           console.log('error');
         }
-      });
+      },
+      (error: any) => {
+        console.error('Failed to submit data', error);
+      }
+    );
+  }
+
+  
+
+ 
+
+  validateAadhaar(aadhaarNumber: string): boolean {
+    const d = [
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+      [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+      [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+      [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+      [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+      [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+      [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+      [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+      [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+    ];
+    const p = [
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+      [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+      [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+      [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+      [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+      [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+      [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+    ];
+    const inv = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9];
+
+    if (aadhaarNumber.length !== 12) return false;
+    if (!/^\d{12}$/.test(aadhaarNumber)) return false;
+    if (/^(.)\1+$/.test(aadhaarNumber)) return false;
+
+    let c = 0;
+    const aadhaarArray = aadhaarNumber.split('').reverse().map(Number);
+
+    for (let i = 0; i < aadhaarArray.length; i++) {
+      c = d[c][p[i % 8][aadhaarArray[i]]];
+    }
+
+    return c === 0;
+  }
+
+  aadhaarValidator(control: AbstractControl): ValidationErrors | null {
+    const aadhaarNumber = control.value;
+    if (aadhaarNumber && !this.validateAadhaar(aadhaarNumber)) {
+      return { invalidAadhaar: true };
+    }
+    return null;
   }
 
   calculateMinDate(): string {

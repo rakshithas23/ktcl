@@ -15,7 +15,7 @@
         >Back</a
       >
 
-      <a [routerLink]="['/logout']" class="btn btn-lg bg-warning m-1">Logout</a>
+      <a [routerLink]="['/logout']"  *ngIf="currentRoute !== '/student' && currentRoute !== '/senior-citizen' && currentRoute !=='/general' && currentRoute !=='/success'" class="btn btn-lg bg-warning m-1">Logout</a>
     </div>
   </div>
 </nav>

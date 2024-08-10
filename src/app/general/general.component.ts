@@ -34,15 +34,18 @@ export class GeneralComponent implements OnInit {
     this.generalForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
       fatherName: ['', [Validators.required, Validators.pattern('[A-Za-z ]+')]],
-      aadharNo: ['', [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')]],
-      mobile: ['', [Validators.required, Validators.pattern('^[6-9]\d{9}$')]],
+      aadharNo: [
+        '',
+        [Validators.required, Validators.pattern('^[2-9]{1}[0-9]{11}$')],
+      ],
+      mobile: ['', [Validators.required]],
       dob: ['', [Validators.required, this.dateValidator.bind(this)]],
       age: ['', Validators.required],
       gender: ['', Validators.required],
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
       city: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^403\\d{3}$')]],
+      pincode: ['', [Validators.required, Validators.pattern('^\d{6}$')]],
       email: ['', [Validators.email]],
       // address_proof_type: ['', [Validators.required]],
       proofAddress: ['', Validators.required],
@@ -66,7 +69,7 @@ export class GeneralComponent implements OnInit {
             [fieldName]: 'File size must not exceed 1 MB.',
           };
           this.generalForm.get(fieldName)?.setErrors({ invalidSize: true });
-          alert("File size must not exceed 1 MB.");
+          alert('File size must not exceed 1 MB.');
           return;
         } else {
           this.fileErrors = { ...this.fileErrors, [fieldName]: '' };
@@ -144,37 +147,139 @@ export class GeneralComponent implements OnInit {
     });
   }
 
+  // onFileSelected(event: any) {
+  //   const fileInput = event.target;
+  //   console.log("fileInput",fileInput)
+
+  //   const file: File = event.target.files[0];
+  //   if (file) {
+  //     const maxSizeInMB = 1;
+  //     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+  //     if (file.size > maxSizeInBytes) {
+  //       alert('The file size exceeds 1 MB. Please Upload a smaller file.');
+  //       fileInput.value = ''; // Clear the file input
+  //       this.generalForm.get('photoBase64')?.setValue('');
+  //       return;
+  //     }
+
+  //     this.photo(file)
+  //       .then((base64: string) => {
+  //         // Do something with the base64 string, e.g., set it in a form control or send it to the backend
+  //         const mimeType = file.type || 'image/png'; // Default to 'image/png' if type is unavailable
+  //         // Prepend the MIME type and encoding information
+  //         const base64WithPrefix = `data:${mimeType};base64,${base64}`;
+  //         // console.log(base64WithPrefix);
+  //         this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
+  //         console.log(this.generalForm.value.photoBase64);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error converting file to Base64:', error);
+  //         this.fileErrors['photo'] = 'Failed to convert the image to Base64.';
+  //       });
+  //   }
+  // }
+
+  // photo(file: File): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       const base64String = (reader.result as string).split(',')[1];
+  //       resolve(base64String);
+  //     };
+  //     reader.onerror = (error) => reject(error);
+  //     reader.readAsDataURL(file);
+  //   });
+  // }
+
   onFileSelected(event: any) {
     const fileInput = event.target;
-    console.log("fileInput",fileInput)
-
     const file: File = event.target.files[0];
+
     if (file) {
       const maxSizeInMB = 1;
       const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-  
+
       if (file.size > maxSizeInBytes) {
-        alert('The file size exceeds 1 MB. Please Upload a smaller file.');
-        fileInput.value = ''; // Clear the file input
-        this.generalForm.get('photoBase64')?.setValue('');
-        return;
+        this.resizephotoImage(file, maxSizeInBytes)
+          .then((resizedFile) => {
+            return this.photo(resizedFile);
+          })
+          .then((base64: string) => {
+            const mimeType = file.type || 'image/png';
+            const base64WithPrefix = `data:${mimeType};base64,${base64}`;
+            console.log(base64WithPrefix);
+            this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
+          })
+          .catch((error) => {
+            console.error('Error processing file:', error);
+            alert('Failed to process the image. Please try again.');
+            fileInput.value = ''; // Clear the file input
+            this.generalForm.get('photoBase64')?.setValue('');
+          });
+      } else {
+        this.photo(file)
+          .then((base64: string) => {
+            const mimeType = file.type || 'image/png';
+            const base64WithPrefix = `data:${mimeType};base64,${base64}`;
+            console.log(base64WithPrefix);
+            this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
+          })
+          .catch((error) => {
+            console.error('Error converting file to Base64:', error);
+            this.fileErrors['photo'] = 'Failed to convert the image to Base64.';
+            fileInput.value = ''; // Clear the file input
+            this.generalForm.get('photoBase64')?.setValue('');
+          });
       }
-  
-      this.photo(file)
-        .then((base64: string) => {
-          // Do something with the base64 string, e.g., set it in a form control or send it to the backend
-          const mimeType = file.type || 'image/png'; // Default to 'image/png' if type is unavailable
-          // Prepend the MIME type and encoding information
-          const base64WithPrefix = `data:${mimeType};base64,${base64}`;
-          // console.log(base64WithPrefix);
-          this.generalForm.get('photoBase64')?.setValue(base64WithPrefix);
-          console.log(this.generalForm.value.photoBase64);
-        })
-        .catch((error) => {
-          console.error('Error converting file to Base64:', error);
-          this.fileErrors['photo'] = 'Failed to convert the image to Base64.';
-        });
     }
+  }
+
+  resizephotoImage(file: File, maxSizeInBytes: number): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          // Calculate the new dimensions while maintaining the aspect ratio
+          const MAX_WIDTH = 1024;
+          const MAX_HEIGHT = 1024;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (blob && blob.size <= maxSizeInBytes) {
+              resolve(new File([blob], file.name, { type: file.type }));
+            } else {
+              reject(new Error('Failed to resize the image.'));
+            }
+          }, file.type);
+        };
+        img.onerror = () => reject(new Error('Failed to load the image.'));
+        img.src = event.target.result;
+      };
+      reader.onerror = () => reject(new Error('Failed to read the file.'));
+      reader.readAsDataURL(file);
+    });
   }
 
   photo(file: File): Promise<string> {
@@ -190,10 +295,10 @@ export class GeneralComponent implements OnInit {
   }
   onSubmit(): void {
     const nameregex = /^[A-Za-zÀ-ÖØ-ÿ' -]{3,50}$/;
-    const aadharegex = /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/;    
+    const aadharegex = /^[2-9]{1}[0-9]{11}$/;
     const phoneregex = /^[6-9]\d{9}$/;
     const addressregex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
-    const pincoderegex = /^403\d{3}$/;
+    const pincoderegex = /^\d{6}$/;
     const emailregex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (this.generalForm.value.name === '') {
@@ -243,8 +348,16 @@ export class GeneralComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
+    if (this.generalForm.value.state === '') {
+      alert('Please Select State');
+      return;
+    }
     if (this.generalForm.value.city === '') {
-      alert('Please Select City');
+      alert('Please Enter City');
+      return;
+    }
+    else if (!nameregex.test(this.generalForm.value.city)) {
+      alert('Please Enter a valid city.');
       return;
     }
     if (this.generalForm.value.pincode === '') {
@@ -317,14 +430,36 @@ export class GeneralComponent implements OnInit {
         let res: Obj = JSON.parse(obj);
         if (res.status === 'success') {
           alert('Details Submitted Successfully!');
-          this.router.navigate(['/payment'], {
-            queryParams: { application_number: res.application_number },
+          const mobile = this.generalForm.value.mobile;
+          const app_number = res.message; // Assuming the OTP is the application number, adjust as necessary
+          // this.sendSms(mobile, app_number);
+          this.router.navigate(['/success'], {
+            queryParams: { application_number: res.message },
           });
         } else {
           alert('Failed to Submit,' + res.message);
           console.log('error');
         }
       });
+  }
+  sendSms(mobile: string, app_number: string): void {
+    const username = 'Sathish@Stepnstones.in';
+    const password = 'Sns12345';
+    const approvedSenderId = 'SNSTPL';
+    const message = `Dear Passenger your Application has been submitted successfully. Your Application Number is - ${app_number}. Kindly Click on the below link to make the payment. - STEPNSTONES`;
+
+    const encMsg = encodeURIComponent(message);
+
+    const fullApiUrl = `http://securesmsc.com/httpapi/send?username=${username}&password=${password}&sender_id=${approvedSenderId}&route=T&phonenumber=${mobile}&message=${encMsg}`;
+
+    this.http.post(fullApiUrl, {}).subscribe(
+      (response: any) => {
+        console.log('SMS sent successfully', response);
+      },
+      (error: any) => {
+        console.error('Failed to send SMS', error);
+      }
+    );
   }
 
   calculateMinDate(): string {
