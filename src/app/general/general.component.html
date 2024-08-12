@@ -228,7 +228,7 @@
         </div>
         <div class="form-group row py-2 text-white">
           <div class="col-lg-4 pb-3">
-            <label>Email Address*</label>
+            <label>Email Address</label>
             <input
               type="email"
               formControlName="email"
@@ -282,13 +282,14 @@
             <input
               type="file"
               class="form-control p-3"
-              accept=".pdf, .jpg, .jpeg, .png"
+              accept="image/*"
+              capture="environment"
               (change)="validateFileSize($event, 'proofAddress')"
             />
-            <small
+            <!-- <small
               >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
               than 1MB.</small
-            >
+            > -->
             <div
               *ngIf="fileErrors['proofAddress']"
               class="text-warning"
@@ -309,10 +310,10 @@
               capture="user"
               (change)="onFileSelected($event)"
             />
-            <small
+            <!-- <small
               >Document should of type PNG/JPG/JPEG/PDF and Size has to be less
               than 1MB.</small
-            >
+            > -->
             <div
               *ngIf="fileErrors['photo']"
               class="text-warning"
@@ -323,9 +324,11 @@
           </div>
           <input type="hidden" formControlName="photoBase64" />
         </div>
-        <button type="submit" class="btn btn-lg btn-warning m-2">
+        <button type="submit" class="btn btn-lg btn-warning m-2" [disabled]="buttonDisable">
           Submit
         </button>
+        <a [routerLink]="['/home']" class="btn btn-lg btn-warning m-2">Back</a>
+
       </form>
     </div>
 

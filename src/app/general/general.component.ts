@@ -5,7 +5,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class GeneralComponent implements OnInit {
   api: any = sessionStorage.getItem('api');
   user_id: any = sessionStorage.getItem('user_id');
-
+  buttonDisable: boolean = false;
   generalForm: FormGroup;
   minDate: string;
   defaultDob: string;
@@ -45,7 +45,7 @@ export class GeneralComponent implements OnInit {
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
       city: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^\d{6}$')]],
+      pincode: ['', [Validators.required, Validators.pattern('^\\d{6}$')]],
       email: ['', [Validators.email]],
       // address_proof_type: ['', [Validators.required]],
       proofAddress: ['', Validators.required],
@@ -355,8 +355,7 @@ export class GeneralComponent implements OnInit {
     if (this.generalForm.value.city === '') {
       alert('Please Enter City');
       return;
-    }
-    else if (!nameregex.test(this.generalForm.value.city)) {
+    } else if (!nameregex.test(this.generalForm.value.city)) {
       alert('Please Enter a valid city.');
       return;
     }
@@ -368,14 +367,20 @@ export class GeneralComponent implements OnInit {
       alert('Please Enter a valid Pincode');
       return;
     }
-    if (this.generalForm.value.email === '') {
-      alert('Please Enter Email Address');
-      return;
+    if (this.generalForm.value.email !== '') {
+      if (!emailregex.test(this.generalForm.value.email)) {
+        alert('Please Enter a valid Email Address');
+        return;
+      }
     }
-    if (!emailregex.test(this.generalForm.value.email)) {
-      alert('Please Enter a valid Email Address');
-      return;
-    }
+    // if (this.generalForm.value.email === '') {
+    //   alert('Please Enter Email Address');
+    //   return;
+    // }
+    // if (!emailregex.test(this.generalForm.value.email)) {
+    //   alert('Please Enter a valid Email Address');
+    //   return;
+    // }
 
     // if (this.generalForm.value.address_proof_type === '') {
     //   alert('Please Select Address Proof Type');
@@ -399,15 +404,15 @@ export class GeneralComponent implements OnInit {
       name: this.generalForm.value.name,
       user_type: '3',
       fatherName: this.generalForm.value.fatherName,
-      aadharNo: this.generalForm.value.aadharNo,
-      mobile: this.generalForm.value.mobile,
+      aadharNo: this.generalForm.value.aadharNo.toString(),
+      mobile: this.generalForm.value.mobile.toString(),
       dob: this.generalForm.value.dob,
       age: this.generalForm.value.age.toString(),
       gender: this.generalForm.value.gender,
       address: this.generalForm.value.address,
       state: this.generalForm.value.state,
       city: this.generalForm.value.city,
-      pincode: this.generalForm.value.pincode,
+      pincode: this.generalForm.value.pincode.toString(),
       email: this.generalForm.value.email,
       proofAddressType: this.generalForm.value.address_proof_type,
       proofAddress: this.generalForm.value.proofAddress,
@@ -416,10 +421,16 @@ export class GeneralComponent implements OnInit {
     };
 
     console.log('data', data);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
 
-    this.http
-      .post(this.api + '/add_gen_details', data)
-      .subscribe((result: any) => {
+    const options = {
+      headers: headers,
+    };
+    this.buttonDisable = true;
+    this.http.post(this.api + '/add_gen_details', data, options).subscribe(
+      (result: any) => {
         let obj = JSON.stringify(result);
         interface Obj {
           insertId: any;
@@ -433,14 +444,21 @@ export class GeneralComponent implements OnInit {
           const mobile = this.generalForm.value.mobile;
           const app_number = res.message; // Assuming the OTP is the application number, adjust as necessary
           // this.sendSms(mobile, app_number);
+          this.buttonDisable = false;
           this.router.navigate(['/success'], {
             queryParams: { application_number: res.message },
           });
         } else {
           alert('Failed to Submit,' + res.message);
+          this.buttonDisable = false;
           console.log('error');
         }
-      });
+      },
+      (error: any) => {
+        this.buttonDisable = false;
+        alert('Failed to submit data' + JSON.stringify(error));
+      }
+    );
   }
   sendSms(mobile: string, app_number: string): void {
     const username = 'Sathish@Stepnstones.in';

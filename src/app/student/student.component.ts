@@ -9,7 +9,8 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
+import { NavigationEnd } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-student',
@@ -17,11 +18,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./student.component.css'],
 })
 export class StudentComponent implements OnInit {
-  private apiUrl = 'http://securesmsc.com/httpapi/send';
   api: any = sessionStorage.getItem('api');
   user_id: any = sessionStorage.getItem('user_id');
   imageBase64Data: string | null = null;
-
+  buttonDisable: boolean = false;
   studentForm: FormGroup;
   minDate: string;
   defaultDob: string;
@@ -31,6 +31,7 @@ export class StudentComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private http: HttpClient,
+    private location: Location
   ) {
     this.minDate = this.calculateMinDate();
     this.defaultDob = this.calculateDefaultDate();
@@ -49,7 +50,7 @@ export class StudentComponent implements OnInit {
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
       city: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^\d{6}$')]],
+      pincode: ['', [Validators.required, Validators.pattern('^\\d{6}$')]],
       email: ['', [Validators.email]],
       institution_type: ['', Validators.required],
       inst_address: ['', Validators.required],
@@ -60,7 +61,15 @@ export class StudentComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url === '/student') {
+          this.location.replaceState('/student');
+        }
+      }
+    });
+  }
   async validateFileSize(event: Event, fieldName: string) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -341,15 +350,14 @@ export class StudentComponent implements OnInit {
       alert('Please Enter a valid Address');
       return;
     }
-    if(this.studentForm.value.state === ''){
-      alert("Please Select State");
+    if (this.studentForm.value.state === '') {
+      alert('Please Select State');
       return;
     }
     if (this.studentForm.value.city === '') {
       alert('Please Enter City');
       return;
-    }
-    else if (!nameregex.test(this.studentForm.value.city)) {
+    } else if (!nameregex.test(this.studentForm.value.city)) {
       alert('Please Enter a valid city.');
       return;
     }
@@ -361,14 +369,17 @@ export class StudentComponent implements OnInit {
       alert('Please Enter a valid Pincode');
       return;
     }
-    if (this.studentForm.value.email === '') {
-      alert('Please Enter Email Address');
-      return;
+    // if (this.studentForm.value.email === '') {
+    //   alert('Please Enter Email Address');
+    //   return;
+    // }
+    if (this.studentForm.value.email !== '') {
+      if (!emailregex.test(this.studentForm.value.email)) {
+        alert('Please Enter a valid Email Address');
+        return;
+      }
     }
-    if (!emailregex.test(this.studentForm.value.email)) {
-      alert('Please Enter a valid Email Address');
-      return;
-    }
+
     if (this.studentForm.value.institution_type === '') {
       alert('Please Select Institution Type');
       return;
@@ -401,15 +412,15 @@ export class StudentComponent implements OnInit {
       name: this.studentForm.value.name,
       user_type: '1',
       fatherName: this.studentForm.value.fatherName,
-      aadharNo: this.studentForm.value.aadharNo,
-      mobile: this.studentForm.value.mobile,
+      aadharNo: this.studentForm.value.aadharNo.toString(),
+      mobile: this.studentForm.value.mobile.toString(),
       dob: this.studentForm.value.dob,
       age: this.studentForm.value.age.toString(),
       gender: this.studentForm.value.gender,
       address: this.studentForm.value.address,
       state: this.studentForm.value.state,
       city: this.studentForm.value.city,
-      pincode: this.studentForm.value.pincode,
+      pincode: this.studentForm.value.pincode.toString(),
       email: this.studentForm.value.email,
       institution_type: this.studentForm.value.institution_type,
       inst_name: this.studentForm.value.inst_address,
@@ -427,7 +438,7 @@ export class StudentComponent implements OnInit {
     const options = {
       headers: headers,
     };
-
+    this.buttonDisable = true;
     this.http.post(this.api + '/add_student_details', data, options).subscribe(
       (result: any) => {
         let obj = JSON.stringify(result);
@@ -446,23 +457,22 @@ export class StudentComponent implements OnInit {
           // this.router.navigate(['/success'], {
           //   queryParams: { application_number: app_number },
           // });
+          this.buttonDisable = false;
           this.router.navigate(['/success'], {
             queryParams: { application_number: res.message },
           });
         } else {
           alert('Failed to Submit,' + res.message);
+          this.buttonDisable = false;
           console.log('error');
         }
       },
       (error: any) => {
-        console.error('Failed to submit data', error);
+        this.buttonDisable = false;
+        alert('Failed to submit data' + JSON.stringify(error));
       }
     );
   }
-
-  
-
- 
 
   validateAadhaar(aadhaarNumber: string): boolean {
     const d = [

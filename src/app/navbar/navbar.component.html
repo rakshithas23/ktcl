@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top py-3">
-  <div class="container-fluid d-flex justify-content-between">
+  <div class="container-fluid d-flex justify-content-center">
     <a class="navbar-brand d-flex align-items-center">
       <img
         src="../../assets/img/log.png"
@@ -8,14 +8,7 @@
       />
     </a>
     <div>
-      <a
-        [routerLink]="['/home']"
-        *ngIf="currentRoute !== '/home' && currentRoute !== '/payment'"
-        class="btn btn-lg bg-warning m-1"
-        >Back</a
-      >
-
-      <a [routerLink]="['/logout']"  *ngIf="currentRoute !== '/student' && currentRoute !== '/senior-citizen' && currentRoute !=='/general' && currentRoute !=='/success'" class="btn btn-lg bg-warning m-1">Logout</a>
+      <a [routerLink]="['/logout']"  *ngIf="currentRoute === '/home'" class="btn btn-sm bg-warning m-1">Logout</a>
     </div>
   </div>
 </nav>

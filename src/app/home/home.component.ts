@@ -1,31 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
+  constructor(private location: Location, private router: Router) {}
   ngOnInit(): void {
-      
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url === '/home') {
+          this.location.replaceState('/home');
+        }
+      }
+    });
   }
-  mobile:string = "";
-  password:any;
-  // api:string="http://103.148.157.47:8081";
-//   api:string="https://atte.stepnstones.in" 
-  // api:string="http://localhost:8081"
-  submitted = false; 
-  // private cookieValue:string;
-
-  spinnerCheck:boolean = false;
-  showError:boolean = false;
-  errorMsg:string = "";
-  
-  
-
-  
-
 }

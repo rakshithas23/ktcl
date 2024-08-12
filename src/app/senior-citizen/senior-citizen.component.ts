@@ -5,7 +5,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,6 +23,7 @@ export class SeniorCitizenComponent implements OnInit {
   defaultDob: string;
   dob: boolean = false;
   fileErrors: { [key: string]: string } = {};
+  buttonDisable: boolean = false;
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -45,7 +46,7 @@ export class SeniorCitizenComponent implements OnInit {
       address: ['', Validators.required],
       state: ['Goa', Validators.required],
       city: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^\d{6}$')]],
+      pincode: ['', [Validators.required, Validators.pattern('^\\d{6}$')]],
       email: ['', [Validators.email]],
       // address_proof_type: ['',[Validators.required]],
       proofAddress: ['', Validators.required],
@@ -360,8 +361,7 @@ export class SeniorCitizenComponent implements OnInit {
     if (this.seniorcitizenForm.value.city === '') {
       alert('Please Enter City');
       return;
-    }
-    else if (!nameregex.test(this.seniorcitizenForm.value.city)) {
+    } else if (!nameregex.test(this.seniorcitizenForm.value.city)) {
       alert('Please Enter a valid city.');
       return;
     }
@@ -373,14 +373,21 @@ export class SeniorCitizenComponent implements OnInit {
       alert('Please Enter a valid Pincode');
       return;
     }
-    if (this.seniorcitizenForm.value.email === '') {
-      alert('Please Enter Email Address');
-      return;
+
+    if (this.seniorcitizenForm.value.email !== '') {
+      if (!emailregex.test(this.seniorcitizenForm.value.email)) {
+        alert('Please Enter a valid Email Address');
+        return;
+      }
     }
-    if (!emailregex.test(this.seniorcitizenForm.value.email)) {
-      alert('Please Enter a valid Email Address');
-      return;
-    }
+    // if (this.seniorcitizenForm.value.email === '') {
+    //   alert('Please Enter Email Address');
+    //   return;
+    // }
+    // if (!emailregex.test(this.seniorcitizenForm.value.email)) {
+    //   alert('Please Enter a valid Email Address');
+    //   return;
+    // }
 
     // if (this.seniorcitizenForm.value.address_proof_type === '') {
     //   alert('Please Select Address proof type');
@@ -407,15 +414,15 @@ export class SeniorCitizenComponent implements OnInit {
       name: this.seniorcitizenForm.value.name,
       user_type: '2',
       fatherName: this.seniorcitizenForm.value.fatherName,
-      aadharNo: this.seniorcitizenForm.value.aadharNo,
-      mobile: this.seniorcitizenForm.value.mobile,
+      aadharNo: this.seniorcitizenForm.value.aadharNo.toString(),
+      mobile: this.seniorcitizenForm.value.mobile.toString(),
       dob: this.seniorcitizenForm.value.dob,
       age: this.seniorcitizenForm.value.age.toString(),
       gender: this.seniorcitizenForm.value.gender,
       address: this.seniorcitizenForm.value.address,
       state: this.seniorcitizenForm.value.state,
       city: this.seniorcitizenForm.value.city,
-      pincode: this.seniorcitizenForm.value.pincode,
+      pincode: this.seniorcitizenForm.value.pincode.toString(),
       email: this.seniorcitizenForm.value.email,
       proofAddressType: this.seniorcitizenForm.value.address_proof_type,
       proofAddress: this.seniorcitizenForm.value.proofAddress,
@@ -424,10 +431,18 @@ export class SeniorCitizenComponent implements OnInit {
       user_id: this.user_id,
     };
     console.log('data', data);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
 
-    this.http
-      .post(this.api + '/add_sc_details', data)
-      .subscribe((result: any) => {
+    const options = {
+      headers: headers,
+    };
+
+    this.buttonDisable = true;
+
+    this.http.post(this.api + '/add_sc_details', data, options).subscribe(
+      (result: any) => {
         let obj = JSON.stringify(result);
         interface Obj {
           insertId: any;
@@ -441,14 +456,21 @@ export class SeniorCitizenComponent implements OnInit {
           const mobile = this.seniorcitizenForm.value.mobile;
           const app_number = res.message; // Assuming the OTP is the application number, adjust as necessary
           // this.sendSms(mobile, app_number);
+          this.buttonDisable = false;
           this.router.navigate(['/success'], {
             queryParams: { application_number: res.message },
           });
         } else {
           alert('Failed to Submit,' + res.message);
+          this.buttonDisable = false;
           console.log('error');
         }
-      });
+      },
+      (error: any) => {
+        this.buttonDisable = false;
+        alert('Failed to submit data' + JSON.stringify(error));
+      }
+    );
   }
 
   sendSms(mobile: string, app_number: string): void {

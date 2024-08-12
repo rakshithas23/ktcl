@@ -21,7 +21,11 @@ export class SuccessComponent implements OnInit {
       this.applicationNumber = params['application_number'];
     });
     this.successForm.patchValue({ applicationNumber: this.applicationNumber });
-
+    const applicationNumberElement =
+      document.getElementById('applicationNumber');
+    if (applicationNumberElement) {
+      applicationNumberElement.textContent = this.applicationNumber;
+    }
   }
 
   constructor(

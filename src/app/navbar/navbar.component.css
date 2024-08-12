@@ -25,10 +25,13 @@
 
 .nav-img {
   width: 300px;
+  border-radius: 20px;
 }
 
 @media screen and (max-width: 991px) {
   .nav-img {
-    width: 210px;
+    width: 250px;
+    border-radius: 20px;
+
   }
 }
