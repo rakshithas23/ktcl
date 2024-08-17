@@ -48,7 +48,7 @@ export class GeneralComponent implements OnInit {
       pincode: ['', [Validators.required, Validators.pattern('^\\d{6}$')]],
       email: ['', [Validators.email]],
       // address_proof_type: ['', [Validators.required]],
-      proofAddress: ['', Validators.required],
+      proofAddress: [''],
       photoBase64: ['', Validators.required],
     });
   }
@@ -387,10 +387,10 @@ export class GeneralComponent implements OnInit {
     //   return;
     // }
 
-    if (this.generalForm.value.proofAddress === '') {
-      alert('Please Upload Address proof document');
-      return;
-    }
+    // if (this.generalForm.value.proofAddress === '') {
+    //   alert('Please Upload Address proof document');
+    //   return;
+    // }
 
     if (this.generalForm.value.photoBase64 === '') {
       alert('Please Upload Photograph');
